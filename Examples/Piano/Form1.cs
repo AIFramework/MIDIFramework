@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using MIDIFramework;
 using NAudio.Midi;
@@ -24,8 +25,9 @@ namespace Piano
         {
             var notes = new List<NoteEvent>();
 
-            //MIDIReader reader = new MIDIReader(@"Пираты Карибского моря - Главная тема [MIDISTOCK.RU].mid");
-            MIDIReader reader = new MIDIReader(@"Звёздные Войны - Imperial March (Имперский Марш) [MIDISTOCK.RU].mid");
+            MIDIReader reader = new MIDIReader(@"C:\Users\marat\Downloads\Пираты Карибского моря - Главная тема [MIDISTOCK.RU].mid");
+            //MIDIReader reader = new MIDIReader(@"C:\Users\marat\Downloads\Звёздные Войны - Imperial March (Имперский Марш) [MIDISTOCK.RU].mid");
+            //MIDIReader reader = new MIDIReader(@"C:\Users\marat\Downloads\Marat.mid");
             //var channels = reader.GetNoteEvents();//.Skip(1).ToList();
             //if(channels.Count == 17 && channels[0].Count == 0)
             //{
@@ -40,7 +42,7 @@ namespace Piano
 
             //группируем и зырим
             //var count = notes
-            //    .Select(x => int.Parse(x.noteName.Last() + ""))
+            //    .Select(x => int.Parse(x.NoteName.Last() + ""))
             //    .GroupBy(x => x)
             //    .OrderBy(x => x.Count())
             //    .ToList();
@@ -54,7 +56,7 @@ namespace Piano
             //{
             //    t.Add(r[i] - r[i - 1]);
             //}
-
+            notes = MidiConverter.ToBaseNotes(notes);
             notes = MidiConverter.ToNewGrid(notes, 50);
 
             //музыка играть

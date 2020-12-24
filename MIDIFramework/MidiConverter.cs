@@ -29,6 +29,13 @@ namespace MIDIFramework
             return copy;
         }
 
+        /// <summary>
+        /// Преобразование абсолютного времени нот в миллисекунды 
+        /// </summary>
+        /// <param name="midiEvents"></param>
+        /// <param name="deltaTicksPerQuarterNote"></param>
+        /// <param name="currentMicroSecondsPerTick">параметр midi-файла</param>
+        /// <returns></returns>
         public static List<MidiEvent> ToRealTime(List<MidiEvent> midiEvents, int deltaTicksPerQuarterNote, ref decimal currentMicroSecondsPerTick)
         {
 
@@ -64,6 +71,26 @@ namespace MIDIFramework
             }
 
             return midiEvents;
+        }
+
+        /// <summary>
+        /// Оставляет только базовые ноты
+        /// </summary>
+        /// <param name="notes"></param>
+        /// <returns></returns>
+        public static List<NoteEvent> ToBaseNotes(List<NoteEvent> notes)
+        {
+            return notes.Where(x => IsDigit(x.NoteName.Last())).ToList();
+        }
+
+        private static bool IsDigit(string str)
+        {
+            return int.TryParse(str, out int result);
+        }
+
+        private static bool IsDigit(char sym)
+        {
+            return IsDigit(sym + "");
         }
     }
 }

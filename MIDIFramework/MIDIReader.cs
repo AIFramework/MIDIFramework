@@ -37,7 +37,7 @@ namespace MIDIFramework
                         .Select(x => new NoteEvent(x.AbsoluteTime, x.Channel, x.CommandCode, x.NoteNumber, x.Velocity))
                         .ToList();
 
-                if(events.Count > 0)
+                if (events.Count > 0)
                     channels.Add(events);
             }
 

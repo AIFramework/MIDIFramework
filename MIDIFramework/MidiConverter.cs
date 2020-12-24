@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using NAudio.Midi;
 
 namespace MIDIFramework
@@ -18,7 +17,7 @@ namespace MIDIFramework
         {
             var copy = notes.Copy();
             var timeMax = notes.Max(x => x.AbsoluteTime);
-            var times = Enumerable.Range(0, (int)timeMax / time + 2).Select(x => x*time).ToArray();
+            var times = Enumerable.Range(0, (int)timeMax / time + 2).Select(x => x * time).ToArray();
             for (int i = 0; i < copy.Count; i++)
             {
                 var arr = times.Select(x => Math.Abs(x - copy[i].AbsoluteTime)).ToList();
@@ -44,7 +43,6 @@ namespace MIDIFramework
 
                 if (midiEvent.AbsoluteTime > lastAbsoluteTime)
                 {
-                    //currentMicroSecondsPerTick = (currentMicroSecondsPerTick != 0m) ? currentMicroSecondsPerTick : 128m;
                     lastRealTime += ((decimal)midiEvent.AbsoluteTime - lastAbsoluteTime) * currentMicroSecondsPerTick;
                 }
 
@@ -57,14 +55,12 @@ namespace MIDIFramework
                     continue;
                 }
 
-                // Add the time to the collection.
                 eventsTimesArr.Add(lastRealTime);
             }
 
             for (int i = 0; i < midiEvents.Count; i++)
             {
-                midiEvents[i].AbsoluteTime = (long)(eventsTimesArr[i]/1000);
-
+                midiEvents[i].AbsoluteTime = (long)(eventsTimesArr[i] / 1000);
             }
 
             return midiEvents;

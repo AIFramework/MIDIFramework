@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using NAudio.Midi;
-using System.Diagnostics;
 
 namespace MIDIFramework
 {
-    public class MIDISynthesizer : IDisposable
+    public class MIDISynthesizer
     {
         private int handle;
         private int deviceId;
@@ -64,10 +63,7 @@ namespace MIDIFramework
             int res = midiOutShortMsg(handle, pianoNote.GetAsShortMessage());
             if (res != 0) return false;
 
-            //res = midiOutClose(handle);
-            //if (res != 0) return false;
             return true;
-
         }
 
         public async Task SendAsync(List<NoteEvent> pianoNotes)
@@ -84,12 +80,12 @@ namespace MIDIFramework
                         var note = sorted[i];
                         int thres = 30;
                         var absoluteTime = note.AbsoluteTime;
-                        if(Math.Abs(absoluteTime - timer.ElapsedMilliseconds) < thres)
+                        if (Math.Abs(absoluteTime - timer.ElapsedMilliseconds) < thres)
                         {
                             Send(note);
                             sorted.RemoveAt(i--);
                         }
-                        else if(timer.ElapsedMilliseconds - absoluteTime > thres) // если вдруг элемент выпал за диапазон в прошлом
+                        else if (timer.ElapsedMilliseconds - absoluteTime > thres) // если вдруг элемент выпал за диапазон в прошлом
                         {
                             sorted.RemoveAt(i--);
                         }
@@ -99,11 +95,6 @@ namespace MIDIFramework
                 }
                 timer.Stop();
             });
-        }
-
-        public void Dispose()
-        {
-            
         }
     }
 }

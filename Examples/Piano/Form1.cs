@@ -1,15 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using MIDIFramework;
 using NAudio.Midi;
@@ -69,25 +59,6 @@ namespace Piano
 
             //музыка играть
             midi.SendAsync(notes);
-        }
-
-        public void Play(int code, int absoluteTime, int delay)//int noteNumber, long absoluteTime = 200, int duration = 0, int velocity = 100, int channel = 1)
-        {
-            Task.Run(async () =>
-            {
-                await Task.Delay((int)absoluteTime);
-                //var note = new NoteEvent()
-                //midi.Send(code, delay);
-                //absoluteTime = 0;// 100;
-                //absoluteTime *= 8;
-                //duration = (int)absoluteTime;
-                //var mess = MidiMessage.StartNote(noteNumber, 100, channel);
-                //var note = new NoteOnEvent(absoluteTime, channel, noteNumber, velocity, duration);
-                //midi.Send(note.GetAsShortMessage());
-                //midi.Send(mess.RawData);
-                //midi.Send(note.OffEvent.GetAsShortMessage());
-                //Thread.Sleep((int)(absoluteTime + duration));
-            });
         }
     }
 }

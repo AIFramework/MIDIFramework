@@ -84,6 +84,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\..\source\repos\AINetFrame\AI\AI.csproj">
+      <Project>{165d777e-8a8e-450b-891a-9046913b6143}</Project>
+      <Name>AI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\MIDIFramework\MIDIFramework.csproj">
       <Project>{35029687-4808-480d-8a85-c0bf60305f59}</Project>
       <Name>MIDIFramework</Name>

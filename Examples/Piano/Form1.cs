@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -13,6 +14,7 @@ namespace Piano
     {
         const string pathBase = @"..\..\Data";
         MIDISynthesizer midi;
+        int time = 50;
         public Form1()
         {
             InitializeComponent();
@@ -26,33 +28,22 @@ namespace Piano
 
         private void button1_Click(object sender, EventArgs e)
         {
+            //clear
+            if (!Directory.Exists("output"))
+            {
+                Directory.CreateDirectory("output");
+            }
+            else
+            {
+                foreach (var path in Directory.GetFiles("output"))
+                {
+                    File.Delete(path);
+                }
+            }
+
             var notes = new List<NoteEvent>();
-            //var r = new List<KeyValuePair<string, int>>();
-            //for (int i = 0; i < 128; i++)
-            //{
-            //    var note = new NAudio.Midi.NoteEvent(1, 1, MidiCommandCode.NoteOn, i, 100);
-            //    var name = note.NoteName;
-            //    var dig = int.Parse(name.Last()+"");
-            //    if(name.Length == 2 && dig > 2 && dig < 7)
-            //        richTextBox1.Text += $"{{ \"{note.NoteName}\", {i} }},\n";
-            //    //r.Add(new KeyValuePair<string, int>(note.NoteName, note.GetAsShortMessage()));
-            //}
-            //return;
-
-            //MIDIReader reader = new MIDIReader($@"{pathBase}\Пираты Карибского моря - Главная тема [MIDISTOCK.RU].mid");
-            //MIDIReader reader = new MIDIReader($@"{pathBase}\Кино - Группа крови [MIDISTOCK.RU].mid");
-            //MIDIReader reader = new MIDIReader($@"{pathBase}\Grand Theft Auto_ San Andreas - Intro (вступление) [MIDISTOCK.RU].mid");
-            //MIDIReader reader = new MIDIReader($@"{pathBase}\Super Mario 64 - Medley.mid");
-            //MIDIReader reader = new MIDIReader($@"{pathBase}\Бумер - Саундтрек из фильма [MIDISTOCK.RU].mid");
-
-            //var channels = reader.GetNoteEventsWithRealTime();
-            //var channels = reader.GetNoteEvents();
-            //for (int ch = 0; ch < channels.Count; ch++)
-            //    for (int i = 0; i < channels[ch].Count; i++)
-            //        notes.Add(channels[ch][i]);
 
             int t = 0;
-            int time = 50;
             foreach (var path in Directory.GetFiles(pathBase))
             {
                 MIDIReader reader = new MIDIReader(path);
@@ -61,35 +52,63 @@ namespace Piano
                 for (int ch = 0; ch < channels.Count; ch++)
                     for (int i = 0; i < channels[ch].Count; i++)
                         notes.Add(channels[ch][i]);
+
                 notes = MidiConverter.ToBaseNotes(notes);
                 notes = MidiConverter.ToNewGrid(notes, time);
 
-                var matr = MidiConverter.ToMatrix(notes, time, 0, 10000);
-                Vector.SaveAsBinary($"output\\m{t++}.matr", matr.ToVector());
-
+                int n = 10000;
+                int l = (int)notes.Max(x => x.AbsoluteTime);
+                for (int i = 0; i < l - n; i += n/2)
+                {
+                    var matr = MidiConverter.ToMatrix(notes, time, i, n);
+                    if (matr.H != 28 || matr.W != 200)
+                        throw new Exception("Error dim");
+                    Vector.SaveAsBinary($"output\\m{t++}.matr", matr.ToVector());
+                }
             }
+        }
 
-            //notes = MidiConverter.ToNoteEvents(matr, time);
+        private void button2_Click(object sender, EventArgs e)
+        {
+            var path = @"C:\Users\marat\Downloads\aaaaaaaa.matr";
+            var vec = new Vector(File.ReadAllLines(path).Select(x => double.Parse(x, CultureInfo.InvariantCulture)).ToArray());
+            var matr = new Matrix(28, 200);
+            matr.Matr = vec;
+            var min = vec.Min();
+            var max = vec.Max();
 
-            //группируем и зырим
-            //var count = notes
-            //    .Select(x => int.Parse(x.NoteName.Last() + ""))
-            //    .GroupBy(x => x)
-            //    .OrderBy(x => x.Count())
-            //    .ToList();
+            matr = (matr - min) / (max - min);
 
-            //шаг смотреть
-            //for (int i = 0; i < 128; i++)
-            //    r.Add(new NAudio.Midi.NoteEvent(1, 1, MidiCommandCode.NoteOn, i, 100).NoteName);
+            var notes = MidiConverter.ToNoteEvents(matr, time);
 
-            //var t = new List<int>();
-            //for (int i = 1; i < r.Count; i++)
-            //{
-            //    t.Add(r[i] - r[i - 1]);
-            //}
+            midi.SendAsync(notes);
+        }
 
-            //музыка играть
-            //midi.SendAsync(notes);
+        private void button3_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < 128; i++)
+            {
+                var note = new NoteEvent(1, 1, MidiCommandCode.NoteOn, i, 100);
+                var name = note.NoteName;
+                var dig = int.Parse(name.Last() + "");
+                if (name.Length == 2 && dig > 2 && dig < 7)
+                    richTextBox1.Text += $"{{ \"{note.NoteName}\", {i} }},\n";
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            MIDIReader reader = new MIDIReader($@"{pathBase}\Ласковый май - Белые розы [MIDISTOCK.RU].mid");
+            var channels = reader.GetNoteEventsWithRealTime();
+            var notes = new List<NoteEvent>();
+            for (int ch = 0; ch < channels.Count; ch++)
+                for (int i = 0; i < channels[ch].Count; i++)
+                    notes.Add(channels[ch][i]);
+
+            notes = MidiConverter.ToBaseNotes(notes);
+            notes = MidiConverter.ToNewGrid(notes, time);
+
+            midi.SendAsync(notes);
         }
     }
 }
